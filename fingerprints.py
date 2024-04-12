@@ -14,5 +14,7 @@ def read(path: str):
     cv.waitKey(0) 
     cv.destroyAllWindows() 
 
+# def compa
+
 if __name__ == "__main__":
     read('hi')
