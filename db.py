@@ -17,6 +17,8 @@ class Database:
             );  
         ''')
 
+        # May need stats being stored
+
         self.conn.commit()
 
     def index(self):
