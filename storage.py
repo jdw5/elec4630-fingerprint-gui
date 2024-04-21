@@ -3,11 +3,10 @@ import numpy as np
 import uuid
 
 class Storage:
-    def __init__(self, path='storage/', npz='data', images='images'):
-        self.root_path = path
-        self.npz_path = path + npz + '/'
-        self.images_path = path + images + '/'
-
+    def __init__(self, path='storage', npz='data', images='images'):
+        self.root_path = path + '/'
+        self.npz_path = self.root_path + npz + '/'
+        self.images_path = self.root_path + images + '/'
 
     def generate_uuid_name(self) -> str:
         return str(uuid.uuid4())
@@ -25,14 +24,17 @@ class Storage:
             filename = self.generate_uuid_name()
         file = str(filename) + '.npz'
         resolved_path = self.npz_path + file
-        np.savez(resolved_path, data)
+        print('NPZ BEFORE')
+        a, b = data
+        # np.savez(resolved_path, data, allow_pickle=True)
+        np.savez(resolved_path, a, b)
+        print('RESOLVED_PATH NPZ', resolved_path)
         return resolved_path
 
     def load_npz(self, path):
-        # Check it is .npz, if not, ensure it is
         if not path.endswith('.npz'):
             path = path + '.npz'
-        data = np.load(path, allow_pickle=True).values()
+        data = np.load(path, allow_pickle=True)
         return data
 
     def load_image(self, path, grayscale=True):

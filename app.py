@@ -12,7 +12,7 @@ class App:
         self.db = Database()
 
         # Hook into storage
-        self.storage = Storage('storage/')
+        self.storage = Storage()
 
         self.root = root
         self.root.title("Fingerprint")
@@ -107,6 +107,20 @@ class App:
         self.processing_label.pack()
         try :
             res = fp.pipeline(file_path)
+            
+            
+            f1, m1, ls1 = res
+            # Create a new record in the database
+            name = self.storage.generate_uuid_name()
+            image_path = self.storage.save_image(f1, name)
+            template_path = self.storage.save_npz((m1, ls1), name)
+            try:
+                print(image_path, template_path)
+                self.db.store(name, image_path, template_path)
+            except:
+                messagebox.showerror("Error", "A database issue has occurred")
+                self.processing_label.config(text="Processing failed.")
+                return False
         except:
             messagebox.showerror("Error", "An error occurred while processing the fingerprint.")
             self.processing_label.config(text="Processing failed.")

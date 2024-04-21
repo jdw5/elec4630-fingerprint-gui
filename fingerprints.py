@@ -109,8 +109,6 @@ def pipeline(path: str) -> tuple:
     # LUT: for each 8-neighborhood and each previous direction [0,8], 
     #      where 8 means "none", provides the list of possible directions
     nd_lut = [[compute_next_ridge_following_directions(pd, x) for pd in range(9)] for x in all_8_neighborhoods]
-
-    
     def follow_ridge_and_compute_angle(x, y, d = 8):
         px, py = x, y
         length = 0.0
@@ -167,7 +165,6 @@ def pipeline(path: str) -> tuple:
     
     # n: number of minutiae
     # c: number of cells in a local structure
-
     xyd = np.array([(x,y,d) for x,y,_,d in valid_minutiae]) # matrix with all minutiae coordinates and directions (n x 3)
 
     # rot: n x 2 x 2 (rotation matrix for each minutia)
@@ -185,7 +182,6 @@ def pipeline(path: str) -> tuple:
     # cell_coords[:,:,np.newaxis,:] - xy :  n x c  x n x 2
     # dists: n x c x n (for each cell of each local structure, the distance from all minutiae)
     dists = np.sum((cell_coords[:,:,np.newaxis,:] - xy)**2, -1)
-
     # cs : n x c x n (the spatial contribution of each minutia to each cell of each local structure)
     cs = Gs(dists)
     diag_indices = np.arange(cs.shape[0])

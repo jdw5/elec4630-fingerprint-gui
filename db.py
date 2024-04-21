@@ -17,9 +17,6 @@ class Database:
                 updated_at text
             );  
         ''')
-
-        # May need stats being stored
-
         self.conn.commit()
 
     def index(self):
@@ -32,11 +29,12 @@ class Database:
         row = self.cursor.fetchone()
         return row
 
-    def store(self, name: str, image_path: str):
+    def store(self, name: str, image_path: str, template_path: str):
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         updated_at = created_at
-        self.cursor.execute("INSERT INTO fingerprints (name, image_path, created_at, updated_at) VALUES (?, ?, ?, ?)",
-                            (name, image_path, created_at, updated_at))
+        self.cursor.execute("INSERT INTO fingerprints (name, image_path, template_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+                    (name, image_path, template_path, created_at, updated_at))
+
         self.conn.commit()
         return self.cursor.lastrowid
     
