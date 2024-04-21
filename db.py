@@ -12,6 +12,7 @@ class Database:
                 id integer PRIMARY KEY,
                 name text NOT NULL,
                 image_path text NOT NULL,
+                template_path text NOT NULL,
                 created_at text,
                 updated_at text
             );  

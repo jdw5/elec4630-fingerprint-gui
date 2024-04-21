@@ -4,9 +4,16 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import filedialog
 from db import Database
+from storage import Storage
 
 class App:
     def __init__(self, root):
+        # Setup database
+        self.db = Database()
+
+        # Hook into storage
+        self.storage = Storage('storage/')
+
         self.root = root
         self.root.title("Fingerprint")
         self.root.geometry("600x400")
@@ -25,12 +32,14 @@ class App:
         self.enrol_button = tk.Button(self.sidebar, text="Home", command=self.to_home)
         self.enrol_button.pack(side="top", pady=10, padx=10)
 
-        # Buttons
         self.enrol_button = tk.Button(self.sidebar, text="Enrol", command=self.to_enrol)
         self.enrol_button.pack(side="top", pady=10, padx=10)
 
-        # Setup database
-        self.db = Database()
+        self.compare_button = tk.Button(self.sidebar, text="Compare", command=self.to_compare)
+        self.compare_button.pack(side="top", pady=10, padx=10)
+        
+        self.roc_button = tk.Button(self.sidebar, text="ROC", command=self.to_roc)
+        self.roc_button.pack(side="top", pady=10, padx=10)
 
         # Initial page
         self.current_page = None
@@ -43,7 +52,6 @@ class App:
         self.current_page = tk.Frame(self.body, bg="white", width=350, height=400)
         self.current_page.pack(fill="both", expand=True)
 
-    
     def to_home(self):
         self.page_change('Home')
         # Add home page content here
@@ -72,24 +80,41 @@ class App:
         submit_button = tk.Button(self.current_page, text="Submit", command=self.create_fingerprint)
         submit_button.pack(pady=10)
 
-    def create_fingerprint(self):
+    def to_compare(self):
+        self.page_change('Compare')
+        # Add compare page content here
+        compare_label = tk.Label(self.current_page, text="Compare Page", font=("Arial", 12), padx=10, pady=10)
+        compare_label.pack()
+    
+    def to_roc(self):
+        self.page_change('ROC')
+        # Add ROC page content here
+        roc_label = tk.Label(self.current_page, text="ROC Page", font=("Arial", 12), padx=10, pady=10)
+        roc_label.pack()
+        
+    def create_fingerprint(self) -> bool:
         name = self.name_entry.get()
         file_path = self.file_path_label.cget("text")
         if not name or not file_path:
             messagebox.showerror("Error", "Please enter a name and choose a file.")
-            return
+            return False
         
         if not file_path.lower().endswith(('.jpg', '.jpeg', '.png')):
             messagebox.showerror("Error", "Please choose a JPG, JPEG, or PNG file.")
-            return
+            return False
         
-        # Perform processing of the fingerprint here
         self.processing_label = tk.Label(self.current_page, text="Processing...", font=("Arial", 10))
         self.processing_label.pack()
-        self.process_finerprint(file_path)
+        try :
+            res = fp.pipeline(file_path)
+        except:
+            messagebox.showerror("Error", "An error occurred while processing the fingerprint.")
+            self.processing_label.config(text="Processing failed.")
+            return False
+        
+        print(res)
         self.processing_label.config(text="Processing... Done!")
-    
-    def process_finerprint(self, filepath: str):
+        return True
         
 
     def choose_file(self):
