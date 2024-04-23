@@ -195,7 +195,8 @@ def pipeline(path: str) -> tuple:
     return (fingerprint, valid_minutiae, local_structures)
 
 
-num_p = 5 # For simplicity: a fixed number of pairs
+num_p = 2 # For simplicity: a fixed number of pairs
+
 def similarity(ls1, ls2) -> float:
     dists = np.linalg.norm(ls1[:,np.newaxis,:] - ls2, axis = -1)
     dists /= np.linalg.norm(ls1, axis = 1)[:,np.newaxis] + np.linalg.norm(ls2, axis = 1) # Normalize as in eq. (17) of MCC paper
@@ -203,28 +204,18 @@ def similarity(ls1, ls2) -> float:
     score = 1 - np.mean(dists[pairs[0], pairs[1]]) # See eq. (23) in MCC paper
     return score
 
-def draw_minutiae_and_cylinder(fingerprint, origin_cell_coords, minutiae, values, i, show_cylinder = True):
-
-    def _compute_actual_cylinder_coordinates(x, y, t, d):
-        c, s = math.cos(d), math.sin(d)
-        rot = np.array([[c, s],[-s, c]])    
-        return (rot@origin_cell_coords.T + np.array([x,y])[:,np.newaxis]).T
+def draw_minutiae(fingerprint, minutiae, termination_color = (255,0,0), bifurcation_color = (0,0,255)):
+    res = cv.cvtColor(fingerprint, cv.COLOR_GRAY2BGR)
     
-    res = draw_minutiae(fingerprint, minutiae)    
-    if show_cylinder:
-        for v, (cx, cy) in zip(values[i], _compute_actual_cylinder_coordinates(*minutiae[i])):
-            cv.circle(res, (int(round(cx)), int(round(cy))), 3, (0,int(round(v*255)),0), 1, cv.LINE_AA)
-    return res
-
-def draw_match_pairs(f1, m1, v1, f2, m2, v2, cells_coords, pairs, i, show_cylinders = True):
-    #nd = _current_parameters.ND
-    h1, w1 = f1.shape
-    h2, w2 = f2.shape
-    p1, p2 = pairs
-    res = np.full((max(h1,h2), w1+w2, 3), 255, np.uint8)
-    res[:h1,:w1] = draw_minutiae_and_cylinder(f1, cells_coords, m1, v1, p1[i], show_cylinders)
-    res[:h2,w1:w1+w2] = draw_minutiae_and_cylinder(f2, cells_coords, m2, v2, p2[i], show_cylinders)
-    for k, (i1, i2) in enumerate(zip(p1, p2)):
-        (x1, y1, *_), (x2, y2, *_) = m1[i1], m2[i2]
-        cv.line(res, (int(x1), int(y1)), (w1+int(x2), int(y2)), (0,0,255) if k!=i else (0,255,255), 1, cv.LINE_AA)
+    for x, y, t, *d in minutiae:
+        color = termination_color if t else bifurcation_color
+        if len(d)==0:
+            cv.drawMarker(res, (x,y), color, cv.MARKER_CROSS, 8)
+        else:
+            d = d[0]
+            ox = int(round(math.cos(d) * 7))
+            oy = int(round(math.sin(d) * 7))
+            cv.circle(res, (x,y), 3, color, 1, cv.LINE_AA)
+            cv.line(res, (x,y), (x+ox,y-oy), color, 1, cv.LINE_AA) 
+                  
     return res

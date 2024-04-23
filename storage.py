@@ -4,9 +4,17 @@ import uuid
 
 class Storage:
     def __init__(self, path='storage', npz='data', images='images'):
-        self.root_path = path + '/'
-        self.npz_path = self.root_path + npz + '/'
-        self.images_path = self.root_path + images + '/'
+        if not path.endswith('/'):
+            path = path + '/'
+        self.root_path = path
+
+        if not npz.endswith('/'):
+            npz = npz + '/'
+        self.npz_path = self.root_path + npz
+
+        if not images.endswith('/'):
+            images = images + '/'
+        self.images_path = self.root_path + images
 
     def generate_uuid_name(self) -> str:
         return str(uuid.uuid4())
@@ -34,7 +42,7 @@ class Storage:
     def load_npz(self, path):
         if not path.endswith('.npz'):
             path = path + '.npz'
-        data = np.load(path, allow_pickle=True)
+        data = np.load(path, allow_pickle=True).values()
         return data
 
     def load_image(self, path, grayscale=True):

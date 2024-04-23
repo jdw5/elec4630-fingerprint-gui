@@ -23,6 +23,11 @@ class Database:
         self.cursor.execute("SELECT * FROM fingerprints")
         rows = self.cursor.fetchall()
         return rows
+    
+    def count(self) -> int:
+        self.cursor.execute("SELECT COUNT(*) FROM fingerprints")
+        row = self.cursor.fetchone()
+        return row[0]
 
     def show(self, id: int):
         self.cursor.execute("SELECT * FROM fingerprints WHERE id=?", (id,))
@@ -41,4 +46,6 @@ class Database:
     def destroy(self, id: int):
         self.cursor.execute("DELETE FROM fingerprints WHERE id=?", (id,))
         self.conn.commit()
+
+    # def seed(self):
     
