@@ -32,11 +32,8 @@ class Storage:
             filename = self.generate_uuid_name()
         file = str(filename) + '.npz'
         resolved_path = self.npz_path + file
-        print('NPZ BEFORE')
         a, b = data
-        # np.savez(resolved_path, data, allow_pickle=True)
         np.savez(resolved_path, a, b)
-        print('RESOLVED_PATH NPZ', resolved_path)
         return resolved_path
 
     def load_npz(self, path):

@@ -13,7 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from PIL import Image
 
-THRESHOLD = 0.7
+THRESHOLD = 0.75
 
 class App:
     def __init__(self, root):
@@ -222,7 +222,6 @@ class App:
             current = self.storage.load_npz(current)
             _, ls2 = current
             score = fp.similarity(ls1, ls2)
-            print(score)
             if score > THRESHOLD:
                 self.result_label = tk.Label(self.current_page, text=f"Match found: {self.db.index()[i][1]}", font=("Arial", 10))
                 self.result_label.pack(pady=10)
@@ -312,7 +311,6 @@ class App:
                 
         fpr, tpr, thresholds = roc_curve(true_matches, scores)
         roc_auc = auc(fpr, tpr)
-        print('AUC', roc_auc)
 
 
         fig = Figure(figsize=(5, 5), dpi=100)
@@ -329,7 +327,11 @@ class App:
         fnr = 1 - tpr
         closest = np.argmin(np.abs(fnr - 0.01))
         estimated_fpr = fpr[closest]
-        print(f'Estimated FPR for FNR of 1%: {estimated_fpr}')
+
+        # Put a label for it in TK
+        roc_label = tk.Label(self.current_page, text=f"FPR for FNR 1%: {estimated_fpr}", font=("Arial", 10))
+        roc_label.pack(pady=10)
+        # print(f'Estimated FPR for FNR of 1%: {estimated_fpr}')
         
         # Create a new FigureCanvasTkAgg object and attach the matplotlib figure
         canvas = FigureCanvasTkAgg(fig, master=self.current_page)  # A tk.DrawingArea.
